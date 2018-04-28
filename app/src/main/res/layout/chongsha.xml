@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:background="#88fff1b1">
+    <TextView
+        android:id="@+id/chongsha"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:textSize="20sp"
+        android:gravity="center_vertical"
+        android:text="冲煞:"
+        />
+    <TextView
+        android:id="@+id/text_chongsha"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textSize="18sp"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@+id/chongsha"
+        android:layout_marginLeft="30dp"
+        />
+</RelativeLayout>

@@ -6,7 +6,9 @@ import android.util.Log;
 import com.example.pineweather.db.City;
 import com.example.pineweather.db.County;
 import com.example.pineweather.db.Province;
+import com.example.pineweather.gson.Almanac;
 import com.example.pineweather.gson.Weather;
+import com.example.pineweather.gson.Weather6;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -53,8 +55,19 @@ public class Utility {
         }
         return false;
     }
-    public static boolean handleCountyResponse(String response,int cityId){
-        if(!TextUtils.isEmpty(response)){
+    public static Weather6 handleCountyResponse(String response){
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather6");
+            String weatherContext=jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContext,Weather6.class);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+            return null;
+
+    }
+        /*if(!TextUtils.isEmpty(response)){
            // Log.d("111111111", "handleCountyResponse: 1111111111");
             try {//JSONObject jsonObject=new JSONObject(response);
                 //JSONArray jsonArray=jsonObject.getJSONArray("HeWeather6");
@@ -83,13 +96,25 @@ public class Utility {
             }
         }
         return false;
-    }
+    }*/
     public static Weather handleWeatherResponse(String response)  {
         try {
             JSONObject jsonObject=new JSONObject(response);
             JSONArray jsonArray=jsonObject.getJSONArray("HeWeather");
             String weatherContext=jsonArray.getJSONObject(0).toString();
             return new Gson().fromJson(weatherContext,Weather.class);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }return  null;
+
+
+    }
+    public static Almanac handleAlmanacResponse(String response){
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+            //JSONObject JSONalmanac=jsonObject.getJSONObject("showapi_res_body");
+            String almanacContext=jsonObject.getJSONObject("showapi_res_body").toString();
+            return new Gson().fromJson(almanacContext,Almanac.class);
         } catch (JSONException e) {
             e.printStackTrace();
         }return  null;

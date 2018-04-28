@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_location"
+            android:icon="@mipmap/ic_location"
+            android:title="选择城市"/>
+        <item
+            android:id="@+id/nav_almanac"
+            android:icon="@mipmap/ic_rili"
+            android:title="老黄历"/>
+        <item
+            android:id="@+id/nav_constellation"
+            android:icon="@mipmap/ic_constelation"
+            android:title="星座运势"/>
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@mipmap/ic_about"
+            android:title="关于"/>
+    </group>
+</menu>

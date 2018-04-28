@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,10 @@ import android.widget.Toast;
 import com.example.pineweather.db.City;
 import com.example.pineweather.db.County;
 import com.example.pineweather.db.Province;
+import com.example.pineweather.gson.Basic;
+import com.example.pineweather.gson.Basic6;
+import com.example.pineweather.gson.Weather;
+import com.example.pineweather.gson.Weather6;
 import com.example.pineweather.util.HttpUtil;
 import com.example.pineweather.util.Utility;
 
@@ -75,17 +80,10 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounty();
                 }else if(currentLevel==LEVEL_COUNTY){
                     String weatherId =countyList.get(position).getWeatherId();
-                    if(getActivity() instanceof MainActivity){
                     Intent intent=new Intent(getActivity(),WeatherActivity.class);
                     intent.putExtra("weather_id",weatherId);
                     startActivity(intent);
-                    getActivity().finish();}
-                    else if(getActivity() instanceof  WeatherActivity){
-                        WeatherActivity activity=(WeatherActivity)getActivity();
-                        activity.drawerLayout.closeDrawers();
-                        activity.swipeRefresh.setRefreshing(true);
-                        activity.requestWeather(weatherId);
-                    }
+                    getActivity().finish();
                 }
             }
         });
@@ -151,11 +149,8 @@ public class ChooseAreaFragment extends Fragment {
             listView.setSelection(0);
             currentLevel = LEVEL_COUNTY;
         } else {
-            int provinceCode = selectedProvince.getProvinceCode();
-            //String cityName = selectedCity.getCityName();
-            int cityCode=selectedCity.getCityCode();
-            String address="http://guolin.tech/api/china/"+provinceCode+"/"+cityCode;
-            //String address = "https://search.heweather.com/find?location="+cityName ;
+            String cityName = selectedCity.getCityName();
+            String address="https://search.heweather.com/find?"+"location="+cityName+"&key=2f59ea21b7a74bc988ce234528b9e2a6";
             queryFromServer(address, "county");
 
         }
@@ -165,14 +160,23 @@ public class ChooseAreaFragment extends Fragment {
         HttpUtil.sendOkHttpRequest(address, new Callback() {
         @Override
         public void onResponse(Call call, Response response) throws IOException {
-            String responseText=response.body().string();
+             final String responseText=response.body().string();
             boolean result=false;
             if("province".equals(type)){
                 result= Utility.handleProvinceResponse(responseText);
             }else if("city".equals(type)){
                 result= Utility.handleCityResponse(responseText,selectedProvince.getId());
             }else if("county".equals(type)){
-                result= Utility.handleCountyResponse(responseText,selectedCity.getId());
+                final Weather6 weather6=Utility.handleCountyResponse(responseText);
+                if(weather6!=null){
+                for(Basic6 basic6 : weather6.basic6list){
+                    County county= new County();
+                    county.setCountyName(basic6.location);
+                    county.setWeatherId(basic6.cid);
+                    county.setCityId(selectedCity.getId());
+                    county.save();
+                }}
+                if(weather6.status.equals("ok")){result=true;}
             }
             if(result){
                 getActivity().runOnUiThread(new Runnable() {
@@ -189,10 +193,12 @@ public class ChooseAreaFragment extends Fragment {
         }
             @Override
             public void onFailure(Call call, IOException e) {
+             e.printStackTrace();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         closeProgressDialog();
+
                         Toast.makeText(getContext(),"加载失败",Toast.LENGTH_SHORT).show();
                     }
                 });
